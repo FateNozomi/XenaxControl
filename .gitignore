@@ -1,0 +1,12 @@
+# User-specific files
+*.suo
+
+# Visual Studio 2015 cache/options directory
+.vs/
+
+# Build results
+[Bb]in/
+[Oo]bj/
+
+#StyleCop files
+*StyleCop.Cache
