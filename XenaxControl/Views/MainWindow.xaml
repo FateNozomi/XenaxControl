@@ -1,4 +1,4 @@
-﻿<Window x:Class="XenaxControl.MainWindow"
+﻿<Window x:Class="XenaxControl.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -10,7 +10,7 @@
         MinWidth="640" MinHeight="480"
         Closing="Window_Closing"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance ViewModels:XenaxCommViewModel, IsDesignTimeCreatable=False}">
+        d:DataContext="{d:DesignInstance ViewModels:XenaxCommViewModel}">
     
     <Grid>
         <Grid.ColumnDefinitions>
