@@ -8,7 +8,7 @@
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance ViewModels:XenaxCommViewModel}">
     <UserControl.Resources>
-        <ViewModels:ListToStringConverter x:Key="ListToStringConverter"/>
+        <ViewModels:EnumerableToStringConverter x:Key="ListToStringConverter"/>
     </UserControl.Resources>
     
     <Grid>

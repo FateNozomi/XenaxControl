@@ -1,31 +1,31 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace XenaxControl.ViewModels
 {
     [ValueConversion(typeof(List<string>), typeof(string))]
-    public class ListToStringConverter : IMultiValueConverter
+    public class EnumerableToStringConverter : IMultiValueConverter
     {
         public object Convert(object[] value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            ObservableCollection<string> input = value[0] as ObservableCollection<string>;
+            IEnumerable enumerable = value[0] as IEnumerable;
 
-            if (input == null)
+            if (enumerable == null)
             {
                 return string.Empty;
             }
 
-            if (input.Count <= 0)
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var item in enumerable)
             {
-                return string.Empty;
+                sb.AppendLine(item.ToString());
             }
 
-            return string.Join(string.Empty, input.ToArray());
+            return sb.ToString();
         }
 
         public object[] ConvertBack(object value, Type[] targetType, object parameter, System.Globalization.CultureInfo culture)
