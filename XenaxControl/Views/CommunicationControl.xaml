@@ -11,6 +11,10 @@
         <ViewModels:EnumerableToStringConverter x:Key="ListToStringConverter"/>
     </UserControl.Resources>
     
+    <UserControl.InputBindings>
+        <KeyBinding Key="Enter" Command="{Binding SendCommand}"/>
+    </UserControl.InputBindings>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -21,22 +25,20 @@
                 <WrapPanel DockPanel.Dock="Left" VerticalAlignment="Center">
                     <TextBlock Text="XENAX" Margin="3"/>
                     <TextBlock Text="IP:" Margin="3"/>
-                    <TextBox Text="{Binding StringIP, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="3"/>
+                    <TextBox Text="{Binding IP, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="3"/>
                     <TextBlock Text="Port:" Margin="3"/>
-                    <TextBox Text="{Binding StringPort, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="3"/>
+                    <TextBox Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="3"/>
                 </WrapPanel>
                 <WrapPanel DockPanel.Dock="Right" VerticalAlignment="Center">
                     <Button
-                        Content="Connect"
+                        Content="{Binding ConnectionStatus}"
                         Command="{Binding ConnectCommand}"
-                        IsEnabled="{Binding IsConnectEnabled, UpdateSourceTrigger=PropertyChanged}"
                         Width="75"
                         Margin="3"
                         />
                     <Button
                         Content="Disconnect"
                         Command="{Binding DisconnectCommand}"
-                        IsEnabled="{Binding IsDisconnectEnabled, UpdateSourceTrigger=PropertyChanged}"
                         Width="75"
                         Margin="3"
                         />
@@ -56,23 +58,19 @@
                     </Grid.ColumnDefinitions>
                     <DockPanel Grid.Column="0" VerticalAlignment="Center">
                         <TextBlock Text="COMMAND:" Margin="3"/>
-                        <TextBox Text="{Binding StringCommand}" Margin="3"/>
+                        <TextBox Text="{Binding Command, UpdateSourceTrigger=PropertyChanged}" Margin="3"/>
                     </DockPanel>
                     <WrapPanel Grid.Column="1" VerticalAlignment="Center">
                         <Button Content="Send" Command="{Binding SendCommand}" Width="75" Margin="3"/>
-                        <Button Content="Process Status" Width="85" Margin="3"/>
+                        <Button Content="Process Status" Command="{Binding ProcessStatusCommand}" Width="85" Margin="3"/>
                     </WrapPanel>
                 </Grid>
                 <DockPanel Grid.Row="1">
                     <DockPanel DockPanel.Dock="Top" LastChildFill="False">
                         <TextBlock DockPanel.Dock="Left" Text="XENAX OUTPUT" Margin="3"/>
-                        <Button DockPanel.Dock="Right" Content="Clear" Width="75" Height="20" Margin="3"/>
+                        <Button DockPanel.Dock="Right" Content="Clear" Command="{Binding ClearCommand}" Width="75" Height="20" Margin="3"/>
                     </DockPanel>
-                    <TextBox
-                        DockPanel.Dock="Bottom"
-                        IsReadOnly="True"
-                        Margin="3"
-                        >
+                    <TextBox ScrollViewer.VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" IsReadOnly="True" Margin="3" TextChanged="TextBox_TextChanged">
                         <TextBox.Text>
                             <MultiBinding Converter="{StaticResource ListToStringConverter}">
                                 <Binding Path="XenaxOutput" Mode="OneWay"/>

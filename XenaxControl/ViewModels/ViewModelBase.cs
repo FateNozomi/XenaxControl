@@ -2,11 +2,11 @@
 
 namespace XenaxControl.ViewModels
 {
-    public abstract class ObservableObject : INotifyPropertyChanged
+    public abstract class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void NotifyPropertyChanged(string propertyName)
+        protected void OnPropertyChanged(string propertyName)
         {
             if (this.PropertyChanged != null)
             {

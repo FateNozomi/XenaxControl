@@ -1,251 +1,154 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using XenaxControl.Models;
 
 namespace XenaxControl.ViewModels
 {
-    public class XenaxCommViewModel : ObservableObject
+    public class XenaxCommViewModel : ViewModelBase
     {
-        private ObservableCollection<string> xenaxOutput;
-        private string stringIP;
-        private string stringPort;
-        private string stringCommand;
-        private bool isConnectEnabled;
-        private bool isDisconnectEnabled;
-        private XenaxHWDriver xenaxDriver;
+        private XenaxCommunication xenaxComm;
+        private string connectionStatus;
 
         public XenaxCommViewModel()
         {
-            this.xenaxOutput = new ObservableCollection<string>();
-            this.stringIP = "192.168.2.100";
-            this.stringPort = "10001";
-            this.isConnectEnabled = true;
-            this.isDisconnectEnabled = false;
+            this.xenaxComm = new XenaxCommunication();
+            this.IP = "192.168.2.100";
+            this.Port = "10001";
+            this.ConnectionStatus = "Connect";
+            this.XenaxOutput = CollectionViewSource.GetDefaultView(this.xenaxComm.XenaxOutput);
+
+            this.WireCommands();
         }
 
-        public string StringIP
+        public string IP
         {
             get
             {
-                return this.stringIP;
+                return this.xenaxComm.IP;
             }
 
             set
             {
-                this.stringIP = value;
-                this.NotifyPropertyChanged("StringIP");
+                this.xenaxComm.IP = value;
+                this.OnPropertyChanged("IP");
             }
         }
 
-        public string StringPort
+        public string Port
         {
             get
             {
-                return this.stringPort;
+                return this.xenaxComm.Port;
             }
 
             set
             {
-                this.stringPort = value;
-                this.NotifyPropertyChanged("StringPort");
+                this.xenaxComm.Port = value;
+                this.OnPropertyChanged("Port");
             }
         }
 
-        public string StringCommand
+        public string Command
         {
             get
             {
-                return this.stringCommand;
+                return this.xenaxComm.Command;
             }
 
             set
             {
-                this.stringCommand = value;
-                this.NotifyPropertyChanged("StringCommand");
+                this.xenaxComm.Command = value;
+                this.OnPropertyChanged("Command");
             }
         }
 
-        public bool IsConnectEnabled
+        public string ConnectionStatus
         {
             get
             {
-                return this.isConnectEnabled;
+                return this.connectionStatus;
             }
 
             set
             {
-                this.isConnectEnabled = value;
-                this.NotifyPropertyChanged("IsConnectEnabled");
+                this.connectionStatus = value;
+                this.OnPropertyChanged("ConnectionStatus");
             }
         }
 
-        public bool IsDisconnectEnabled
+        public ICollectionView XenaxOutput { get; private set; }
+
+        public RelayCommand ConnectCommand { get; private set; }
+
+        public RelayCommand DisconnectCommand { get; private set; }
+
+        public RelayCommand SendCommand { get; private set; }
+
+        public RelayCommand ProcessStatusCommand { get; private set; }
+
+        public RelayCommand ClearCommand { get; private set; }
+
+        private void WireCommands()
         {
-            get
-            {
-                return this.isDisconnectEnabled;
-            }
+            bool connectEnabled = true;
 
-            set
-            {
-                this.isDisconnectEnabled = value;
-                this.NotifyPropertyChanged("IsDisconnectEnabled");
-            }
-        }
-        
-        public ObservableCollection<string> XenaxOutput
-        {
-            get
-            {
-                return this.xenaxOutput;
-            }
+            this.ConnectCommand = new RelayCommand(
+                param =>
+                {
+                    this.ConnectionStatus = "Connecting";
+                    connectEnabled = false;
+                    Task.Run(() =>
+                    {
+                        this.xenaxComm.Connect();
+                        connectEnabled = !this.xenaxComm.Connected;
+                    });
+                },
+                param =>
+                {
+                    this.ConnectionStatus = !this.xenaxComm.Connected ? "Connect" : "Connected";
+                    return connectEnabled;
+                });
 
-            set
-            {
-                this.xenaxOutput = value;
-                this.NotifyPropertyChanged("XenaxOutput");
-            }
-        }
+            this.DisconnectCommand = new RelayCommand(
+                param =>
+                {
+                    this.xenaxComm.Disconnect();
+                    connectEnabled = true;
+                },
+                param => this.xenaxComm.Connected);
 
-        public ICommand ConnectCommand
-        {
-            get { return new Command(this.Connect); }
-        }
+            this.SendCommand = new RelayCommand(
+                param =>
+                {
+                    this.xenaxComm.Send();
+                    this.Command = string.Empty;
+                    this.XenaxOutput.Refresh();
+                },
+                param => this.xenaxComm.Connected);
 
-        public ICommand DisconnectCommand
-        {
-            get { return new Command(this.Disconnect); }
-        }
+            this.ProcessStatusCommand = new RelayCommand(
+                param =>
+                {
+                    this.xenaxComm.GetProcessStatus();
+                    this.XenaxOutput.Refresh();
+                },
+                param => this.xenaxComm.Connected);
 
-        public ICommand SendCommand
-        {
-            get { return new Command(this.Send); }
-        }
-
-        private void Connect()
-        {
-            if (string.IsNullOrEmpty(this.stringIP))
-            {
-                MessageBox.Show("Please enter a valid IP address.", "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(this.StringPort))
-            {
-                MessageBox.Show("Please enter a valid Port.", "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
-            string[] stringIPArr = this.stringIP.Split('.');
-            byte[] ip;
-            int port = 0;
-
-            try
-            {
-                ip = this.ValidateIP(stringIPArr);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
-            try
-            {
-                port = Convert.ToInt32(this.stringPort);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Invalid XENAX driver Port: " + ex.Message, "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
-            this.xenaxDriver = new XenaxHWDriver(string.Empty, ip, port);
-
-            //Task<bool> isConnected = Task.Run(() => 
-            //{
-            //    try
-            //    {
-            //        return this.xenaxDriver.Connect();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        MessageBox.Show(ex.Message, "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            //        return false;
-            //    }
-            //});
-            bool isConnected = false;
-
-            try
-            {
-                isConnected = this.xenaxDriver.Connect();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-
-            if (isConnected)
-            {
-                this.IsConnectEnabled = false;
-                this.IsDisconnectEnabled = true;
-            }
-            else
-            {
-                this.isConnectEnabled = true;
-                this.IsDisconnectEnabled = false;
-            }
-        }
-
-        private byte[] ValidateIP(string[] stringIP)
-        {
-            byte[] ip = new byte[stringIP.Length];
-            if (stringIP.Length != 4)
-            {
-                throw new ArgumentException("IP address format is invalid. Please key in the correct IP address of XENAX driver.");
-            }
-
-            for (int i = 0; i < stringIP.Length; i++)
-            {
-                ip[i] = Convert.ToByte(stringIP[i]);
-            }
-
-            return ip;
-        }
-
-        private void Disconnect()
-        {
-            if (this.xenaxDriver != null)
-            {
-                this.xenaxDriver.Disconnect();
-            }
-
-            this.IsConnectEnabled = true;
-            this.IsDisconnectEnabled = false;
-        }
-
-        private void Send()
-        {
-            if (this.xenaxDriver == null)
-            {
-                MessageBox.Show("XENAX Driver is not connected.", "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-
-            try
-            {
-                string output = this.xenaxDriver.SendCommand(this.StringCommand);
-                this.xenaxOutput.Add(string.Format("> {0}\r\n", output));
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
+            this.ClearCommand = new RelayCommand(
+                param =>
+                {
+                    this.xenaxComm.ClearXenaxOutput();
+                    this.XenaxOutput.Refresh();
+                },
+                param => !this.XenaxOutput.IsEmpty);
         }
     }
 }
