@@ -9,12 +9,14 @@
              d:DataContext="{d:DesignInstance ViewModels:XenaxCommViewModel}">
     <UserControl.Resources>
         <ViewModels:EnumerableToStringConverter x:Key="ListToStringConverter"/>
+        <ViewModels:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
-    
+
     <UserControl.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding SendCommand}"/>
     </UserControl.InputBindings>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -30,18 +32,56 @@
                     <TextBox Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="3"/>
                 </WrapPanel>
                 <WrapPanel DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <Grid Visibility="{Binding ConnectCommand.Execution, Converter={StaticResource NullToVisibilityConverter}}" VerticalAlignment="Center">
+                        <Label
+                            Content="Connecting..."
+                            Visibility="{Binding ConnectCommand.Execution.IsNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            VerticalAlignment="Center"
+                            />
+                        <WrapPanel>
+                            <Label
+                                Content="Connected:"
+                                Visibility="{Binding ConnectCommand.Execution.IsSuccessfullyCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                VerticalAlignment="Center"
+                                />
+                            <Label
+                                Content="{Binding ConnectCommand.Execution.Result}"
+                                Visibility="{Binding ConnectCommand.Execution.IsSuccessfullyCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                VerticalAlignment="Center"
+                                />
+                        </WrapPanel>
+                        <Label
+                            Content="{Binding ConnectCommand.Execution.ErrorMessage}"
+                            Visibility="{Binding ConnectCommand.Execution.IsFaulted, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            VerticalAlignment="Center"
+                            />
+                        <Label
+                            Content="Canceled"
+                            Visibility="{Binding ConnectCommand.Execution.IsCanceled, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Foreground="Blue"
+                            />
+                    </Grid>
                     <Button
                         Content="{Binding ConnectionStatus}"
                         Command="{Binding ConnectCommand}"
                         Width="75"
                         Margin="3"
                         />
-                    <Button
-                        Content="Disconnect"
-                        Command="{Binding DisconnectCommand}"
-                        Width="75"
-                        Margin="3"
-                        />
+                    <Grid>
+                        <Button
+                            Content="Disconnect"
+                            Command="{Binding DisconnectCommand}"
+                            Width="75"
+                            Margin="3"
+                            />
+                        <Button
+                            Content="Cancel"
+                            Command="{Binding ConnectCommand.CancelCommand}"
+                            Visibility="{Binding ConnectCommand.Execution.IsNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}"
+                            Width="75"
+                            Margin="3"
+                            />
+                    </Grid>
                 </WrapPanel>
             </DockPanel>
         </GroupBox>

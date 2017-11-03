@@ -9,10 +9,7 @@ namespace XenaxControl.ViewModels
         public NotifyTaskCompletion(Task<TResult> task)
         {
             this.Task = task;
-            if (!task.IsCompleted)
-            {
-                this.TaskCompletion = this.WatchTaskAsync(task);
-            }
+            this.TaskCompletion = this.WatchTaskAsync(task);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -10,6 +10,7 @@
         MinWidth="640" MinHeight="480"
         Closing="Window_Closing"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance ViewModels:XenaxCommViewModel}">
     
     <Grid>

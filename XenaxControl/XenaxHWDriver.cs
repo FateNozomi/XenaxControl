@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace XenaxControl
@@ -16,6 +17,7 @@ namespace XenaxControl
         private IPAddress ip;
         private int port;
         private Socket commandSocket;
+        private object threadLock;
 
         public XenaxHWDriver(string driverName, byte[] ip, int port)
         {
@@ -23,6 +25,7 @@ namespace XenaxControl
             this.ip = new IPAddress(ip);
             this.port = port;
             this.Connected = false;
+            this.threadLock = new object();
             driverCount++;
         }
 
@@ -48,7 +51,10 @@ namespace XenaxControl
         {
             get
             {
-                this.IsDeviceConnected();
+                lock (this.threadLock)
+                {
+                    this.IsDeviceConnected();
+                }
 
                 return base.Connected;
             }
@@ -71,6 +77,31 @@ namespace XenaxControl
             this.commandSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             this.commandSocket.Connect(commandEndPoint);
             this.Connected = this.commandSocket.Connected;
+
+            return this.Connected;
+        }
+
+        public async Task<bool> ConnectAsync(CancellationToken token)
+        {
+            IPEndPoint commandEndPoint = new IPEndPoint(this.ip, this.port);
+            this.commandSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            bool operationComplete = false;
+            SocketAsyncEventArgs se = new SocketAsyncEventArgs();
+            se.RemoteEndPoint = commandEndPoint;
+            se.UserToken = this.commandSocket;
+            se.Completed += (sender, e) => operationComplete = true;
+
+            this.commandSocket.ConnectAsync(se);
+
+            await Task.Run(() =>
+            {
+                while (!operationComplete)
+                {
+                    Task.Delay(100, token).ConfigureAwait(false);
+                    token.ThrowIfCancellationRequested();
+                }
+            }).ConfigureAwait(false);
 
             return this.Connected;
         }
@@ -141,7 +172,7 @@ namespace XenaxControl
         {
             return this.SendCommand("TES");
         }
-        
+
         private void IsDeviceConnected()
         {
             if (this.commandSocket == null)

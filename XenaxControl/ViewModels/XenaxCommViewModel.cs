@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -86,7 +87,7 @@ namespace XenaxControl.ViewModels
 
         public ICollectionView XenaxOutput { get; private set; }
 
-        public RelayCommand ConnectCommand { get; private set; }
+        public IAsyncCommand ConnectCommand { get; private set; }
 
         public RelayCommand DisconnectCommand { get; private set; }
 
@@ -98,30 +99,17 @@ namespace XenaxControl.ViewModels
 
         private void WireCommands()
         {
-            bool connectEnabled = true;
-
-            this.ConnectCommand = new RelayCommand(
-                param =>
+            this.ConnectCommand = new AsyncCommand<bool>(
+                async token =>
                 {
-                    this.ConnectionStatus = "Connecting";
-                    connectEnabled = false;
-                    Task.Run(() =>
-                    {
-                        this.xenaxComm.Connect();
-                        connectEnabled = !this.xenaxComm.Connected;
-                    });
-                },
-                param =>
-                {
-                    this.ConnectionStatus = !this.xenaxComm.Connected ? "Connect" : "Connected";
-                    return connectEnabled;
+                    await this.xenaxComm.ConnectAsync(token);
+                    return this.xenaxComm.Connected;
                 });
 
             this.DisconnectCommand = new RelayCommand(
                 param =>
                 {
                     this.xenaxComm.Disconnect();
-                    connectEnabled = true;
                 },
                 param => this.xenaxComm.Connected);
 

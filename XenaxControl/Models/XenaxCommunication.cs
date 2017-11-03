@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -86,6 +87,49 @@ namespace XenaxControl.Models
             {
                 MessageBox.Show(ex.Message, "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
+        }
+
+        public async Task<bool> ConnectAsync(CancellationToken token)
+        {
+            if (string.IsNullOrEmpty(this.IP))
+            {
+                MessageBox.Show("Please enter a valid IP address.", "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(this.Port))
+            {
+                MessageBox.Show("Please enter a valid Port.", "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+
+            string[] arrIP = this.IP.Split('.');
+            byte[] byteIP;
+            int port = 0;
+
+            try
+            {
+                byteIP = this.ValidateIP(arrIP);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+
+            try
+            {
+                port = Convert.ToInt32(this.Port);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Invalid XENAX driver Port: " + ex.Message, "XENAX", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return false;
+            }
+
+            this.xenaxDriver = new XenaxHWDriver(string.Empty, byteIP, port);
+
+            return await this.xenaxDriver.ConnectAsync(token);
         }
 
         public void Disconnect()
