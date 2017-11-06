@@ -3,13 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Converters ="clr-namespace:XenaxControl.Converters"
              xmlns:ViewModels ="clr-namespace:XenaxControl.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance ViewModels:XenaxCommViewModel}">
     <UserControl.Resources>
-        <ViewModels:EnumerableToStringConverter x:Key="ListToStringConverter"/>
-        <ViewModels:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <Converters:EnumerableToStringConverter x:Key="ListToStringConverter"/>
+        <Converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
 
@@ -38,18 +39,11 @@
                             Visibility="{Binding ConnectCommand.Execution.IsNotCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
                             VerticalAlignment="Center"
                             />
-                        <WrapPanel>
-                            <Label
-                                Content="Connected:"
-                                Visibility="{Binding ConnectCommand.Execution.IsSuccessfullyCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                VerticalAlignment="Center"
-                                />
-                            <Label
-                                Content="{Binding ConnectCommand.Execution.Result}"
-                                Visibility="{Binding ConnectCommand.Execution.IsSuccessfullyCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                VerticalAlignment="Center"
-                                />
-                        </WrapPanel>
+                        <Label
+                            Content="{Binding ConnectionStatus}"
+                            Visibility="{Binding ConnectCommand.Execution.IsSuccessfullyCompleted, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            VerticalAlignment="Center"
+                            />
                         <Label
                             Content="{Binding ConnectCommand.Execution.ErrorMessage}"
                             Visibility="{Binding ConnectCommand.Execution.IsFaulted, Converter={StaticResource BooleanToVisibilityConverter}}"

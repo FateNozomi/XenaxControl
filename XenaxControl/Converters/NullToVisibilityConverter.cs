@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Data;
 
-namespace XenaxControl.ViewModels
+namespace XenaxControl.Converters
 {
     public class NullToVisibilityConverter : IValueConverter
     {

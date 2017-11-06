@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Data;
 
-namespace XenaxControl.ViewModels
+namespace XenaxControl.Converters
 {
     [ValueConversion(typeof(List<string>), typeof(string))]
     public class EnumerableToStringConverter : IMultiValueConverter

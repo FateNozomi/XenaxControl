@@ -62,11 +62,11 @@
     <Compile Include="Models\XenaxCommunication.cs" />
     <Compile Include="ViewModels\AsyncCommand.cs" />
     <Compile Include="ViewModels\IAsyncCommand.cs" />
-    <Compile Include="ViewModels\EnumerableToStringConverter.cs" />
     <Compile Include="ViewModels\NotifyTaskCompletion.cs" />
-    <Compile Include="ViewModels\NullToVisibilityConverter.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="Converters\EnumerableToStringConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="ViewModels\XenaxCommViewModel.cs" />
     <Compile Include="Views\CommunicationControl.xaml.cs">
       <DependentUpon>CommunicationControl.xaml</DependentUpon>
