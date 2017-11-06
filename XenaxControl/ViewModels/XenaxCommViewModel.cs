@@ -23,7 +23,6 @@ namespace XenaxControl.ViewModels
             this.xenaxComm = new XenaxCommunication();
             this.IP = "192.168.2.100";
             this.Port = "10001";
-            this.ConnectionStatus = "Connect";
             this.XenaxOutput = CollectionViewSource.GetDefaultView(this.xenaxComm.XenaxOutput);
 
             this.WireCommands();

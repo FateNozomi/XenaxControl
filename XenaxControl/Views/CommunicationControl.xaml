@@ -56,7 +56,7 @@
                             />
                     </Grid>
                     <Button
-                        Content="{Binding ConnectionStatus}"
+                        Content="Connect"
                         Command="{Binding ConnectCommand}"
                         Width="75"
                         Margin="3"
