@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace XenaxControl.ViewModels
+namespace XenaxControl
 {
     public class NotifyTaskCompletion<TResult> : INotifyPropertyChanged
     {

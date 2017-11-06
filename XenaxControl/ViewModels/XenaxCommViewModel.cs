@@ -13,7 +13,7 @@ using XenaxControl.Models;
 
 namespace XenaxControl.ViewModels
 {
-    public class XenaxCommViewModel : ViewModelBase
+    public class XenaxCommViewModel : PropertyChangedBase
     {
         private XenaxCommunication xenaxComm;
         private string connectionStatus;
@@ -103,13 +103,24 @@ namespace XenaxControl.ViewModels
                 async token =>
                 {
                     await this.xenaxComm.ConnectAsync(token);
-                    return this.xenaxComm.Connected;
-                });
+                    if (this.xenaxComm.Connected)
+                    {
+                        this.ConnectionStatus = "Connected";
+                        return true;
+                    }
+                    else
+                    {
+                        this.ConnectionStatus = "Failed to connect";
+                        return false;
+                    }
+                },
+                param => !this.xenaxComm.Connected);
 
             this.DisconnectCommand = new RelayCommand(
                 param =>
                 {
                     this.xenaxComm.Disconnect();
+                    this.ConnectionStatus = "Disconnected";
                 },
                 param => this.xenaxComm.Connected);
 

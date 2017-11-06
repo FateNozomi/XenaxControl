@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace XenaxControl.ViewModels
+namespace XenaxControl
 {
     public class RelayCommand : ICommand
     {

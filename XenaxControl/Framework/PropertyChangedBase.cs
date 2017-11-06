@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace XenaxControl.ViewModels
+namespace XenaxControl
 {
-    public abstract class ViewModelBase : INotifyPropertyChanged
+    public abstract class PropertyChangedBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

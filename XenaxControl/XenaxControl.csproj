@@ -60,13 +60,13 @@
     <Compile Include="IDriver.cs" />
     <Compile Include="IntBits.cs" />
     <Compile Include="Models\XenaxCommunication.cs" />
-    <Compile Include="ViewModels\AsyncCommand.cs" />
-    <Compile Include="ViewModels\IAsyncCommand.cs" />
-    <Compile Include="ViewModels\NotifyTaskCompletion.cs" />
-    <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="Framework\AsyncCommand.cs" />
+    <Compile Include="Framework\IAsyncCommand.cs" />
     <Compile Include="Converters\EnumerableToStringConverter.cs" />
+    <Compile Include="Framework\NotifyTaskCompletion.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Framework\PropertyChangedBase.cs" />
+    <Compile Include="Framework\RelayCommand.cs" />
     <Compile Include="ViewModels\XenaxCommViewModel.cs" />
     <Compile Include="Views\CommunicationControl.xaml.cs">
       <DependentUpon>CommunicationControl.xaml</DependentUpon>
