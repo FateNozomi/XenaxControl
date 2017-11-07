@@ -28,9 +28,9 @@
                 <WrapPanel DockPanel.Dock="Left" VerticalAlignment="Center">
                     <TextBlock Text="XENAX" Margin="3"/>
                     <TextBlock Text="IP:" Margin="3"/>
-                    <TextBox Text="{Binding IP, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="3"/>
+                    <TextBox Text="{Binding IP, UpdateSourceTrigger=PropertyChanged}" MaxLength="15" Width="95" Margin="3"/>
                     <TextBlock Text="Port:" Margin="3"/>
-                    <TextBox Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="3"/>
+                    <TextBox Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" MaxLength="5" Width="40" Margin="3"/>
                 </WrapPanel>
                 <WrapPanel DockPanel.Dock="Right" VerticalAlignment="Center">
                     <Grid Visibility="{Binding ConnectCommand.Execution, Converter={StaticResource NullToVisibilityConverter}}" VerticalAlignment="Center">
