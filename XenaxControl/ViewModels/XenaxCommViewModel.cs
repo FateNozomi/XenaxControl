@@ -38,7 +38,7 @@ namespace XenaxControl.ViewModels
             set
             {
                 this.xenaxComm.IP = value;
-                this.OnPropertyChanged("IP");
+                this.OnPropertyChanged();
             }
         }
 
@@ -52,7 +52,7 @@ namespace XenaxControl.ViewModels
             set
             {
                 this.xenaxComm.Port = value;
-                this.OnPropertyChanged("Port");
+                this.OnPropertyChanged();
             }
         }
 
@@ -66,7 +66,7 @@ namespace XenaxControl.ViewModels
             set
             {
                 this.xenaxComm.Command = value;
-                this.OnPropertyChanged("Command");
+                this.OnPropertyChanged();
             }
         }
 
@@ -80,7 +80,7 @@ namespace XenaxControl.ViewModels
             set
             {
                 this.connectionStatus = value;
-                this.OnPropertyChanged("ConnectionStatus");
+                this.OnPropertyChanged();
             }
         }
 

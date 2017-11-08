@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace XenaxControl
 {
@@ -6,11 +7,13 @@ namespace XenaxControl
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged(string propertyName)
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (this.PropertyChanged != null)
+            PropertyChangedEventHandler handler = this.PropertyChanged;
+
+            if (handler != null)
             {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                handler(this, new PropertyChangedEventArgs(propertyName));
             }
         }
     }
