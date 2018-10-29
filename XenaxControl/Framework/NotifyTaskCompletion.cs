@@ -2,14 +2,14 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace XenaxControl
+namespace Framework.MVVM
 {
     public class NotifyTaskCompletion<TResult> : INotifyPropertyChanged
     {
         public NotifyTaskCompletion(Task<TResult> task)
         {
-            this.Task = task;
-            this.TaskCompletion = this.WatchTaskAsync(task);
+            Task = task;
+            TaskCompletion = WatchTaskAsync(task);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -20,8 +20,8 @@ namespace XenaxControl
         {
             get
             {
-                return (this.Task.Status == TaskStatus.RanToCompletion) ?
-                    this.Task.Result : default(TResult);
+                return (Task.Status == TaskStatus.RanToCompletion) ?
+                    Task.Result : default(TResult);
             }
         }
 
@@ -29,7 +29,7 @@ namespace XenaxControl
         {
             get
             {
-                return this.Task.Status;
+                return Task.Status;
             }
         }
 
@@ -37,7 +37,7 @@ namespace XenaxControl
         {
             get
             {
-                return this.Task.IsCompleted;
+                return Task.IsCompleted;
             }
         }
 
@@ -45,7 +45,7 @@ namespace XenaxControl
         {
             get
             {
-                return !this.Task.IsCompleted;
+                return !Task.IsCompleted;
             }
         }
 
@@ -53,7 +53,7 @@ namespace XenaxControl
         {
             get
             {
-                return this.Task.Status == TaskStatus.RanToCompletion;
+                return Task.Status == TaskStatus.RanToCompletion;
             }
         }
 
@@ -61,7 +61,7 @@ namespace XenaxControl
         {
             get
             {
-                return this.Task.IsCanceled;
+                return Task.IsCanceled;
             }
         }
 
@@ -69,7 +69,7 @@ namespace XenaxControl
         {
             get
             {
-                return this.Task.IsFaulted;
+                return Task.IsFaulted;
             }
         }
 
@@ -77,7 +77,7 @@ namespace XenaxControl
         {
             get
             {
-                return this.Task.Exception;
+                return Task.Exception;
             }
         }
 
@@ -85,7 +85,7 @@ namespace XenaxControl
         {
             get
             {
-                return (this.Exception == null) ? null : this.Exception.InnerException;
+                return (Exception == null) ? null : Exception.InnerException;
             }
         }
 
@@ -93,7 +93,7 @@ namespace XenaxControl
         {
             get
             {
-                return (this.InnerException == null) ? null : this.InnerException.Message;
+                return (InnerException == null) ? null : InnerException.Message;
             }
         }
 
@@ -109,7 +109,7 @@ namespace XenaxControl
             {
             }
 
-            var propertyChanged = this.PropertyChanged;
+            var propertyChanged = PropertyChanged;
             if (propertyChanged == null)
             {
                 return;
@@ -119,11 +119,11 @@ namespace XenaxControl
             propertyChanged(this, new PropertyChangedEventArgs("IsCompleted"));
             propertyChanged(this, new PropertyChangedEventArgs("IsNotCompleted"));
 
-            if (this.Task.IsCanceled)
+            if (Task.IsCanceled)
             {
                 propertyChanged(this, new PropertyChangedEventArgs("IsCanceled"));
             }
-            else if (this.Task.IsFaulted)
+            else if (Task.IsFaulted)
             {
                 propertyChanged(this, new PropertyChangedEventArgs("IsFaulted"));
                 propertyChanged(this, new PropertyChangedEventArgs("Exception"));

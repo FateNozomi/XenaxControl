@@ -2,12 +2,12 @@
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace XenaxControl
+namespace Framework.MVVM
 {
     public class RelayCommand : ICommand
     {
-        private readonly Action<object> execute;
-        private readonly Predicate<object> canExecute;
+        private readonly Action<object> _execute;
+        private readonly Predicate<object> _canExecute;
 
         public RelayCommand(Action<object> execute)
             : this(execute, null)
@@ -21,8 +21,8 @@ namespace XenaxControl
                 throw new ArgumentException("execute");
             }
 
-            this.execute = execute;
-            this.canExecute = canExecute;
+            _execute = execute;
+            _canExecute = canExecute;
         }
 
         public event EventHandler CanExecuteChanged
@@ -34,12 +34,12 @@ namespace XenaxControl
         [DebuggerStepThrough]
         public bool CanExecute(object parameter)
         {
-            return this.canExecute == null ? true : this.canExecute(parameter);
+            return _canExecute == null ? true : _canExecute(parameter);
         }
 
         public void Execute(object parameter)
         {
-            this.execute(parameter);
+            _execute(parameter);
         }
     }
 }

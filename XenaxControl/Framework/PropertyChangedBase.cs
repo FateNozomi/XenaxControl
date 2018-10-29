@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace XenaxControl
+namespace Framework.MVVM
 {
     public abstract class PropertyChangedBase : INotifyPropertyChanged
     {
@@ -9,12 +10,19 @@ namespace XenaxControl
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = this.PropertyChanged;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
-            if (handler != null)
+        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
             {
-                handler(this, new PropertyChangedEventArgs(propertyName));
+                return false;
             }
+
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }

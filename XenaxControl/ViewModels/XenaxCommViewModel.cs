@@ -1,92 +1,37 @@
-﻿using System;
+﻿using Framework.MVVM;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Net;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Input;
-using XenaxControl.Models;
+using XenaxControl.Hardware.Drivers;
+using XenaxControl.Utilities;
 
 namespace XenaxControl.ViewModels
 {
     public class XenaxCommViewModel : PropertyChangedBase
     {
-        private XenaxCommunication xenaxComm;
-        private string connectionStatus;
+        private List<string> _xenaxOutput = new List<string>();
+        private XenaxAxisDriver _driver;
 
         public XenaxCommViewModel()
         {
-            this.xenaxComm = new XenaxCommunication();
-            this.IP = "192.168.2.100";
-            this.Port = "10001";
-            this.XenaxOutput = CollectionViewSource.GetDefaultView(this.xenaxComm.XenaxOutput);
-
-            this.WireCommands();
+            IP = "192.168.2.100";
+            Port = 10001;
+            XenaxOutput = CollectionViewSource.GetDefaultView(_xenaxOutput);
+            WireCommands();
         }
 
-        public string IP
-        {
-            get
-            {
-                return this.xenaxComm.IP;
-            }
+        public string IP { get; set; }
 
-            set
-            {
-                this.xenaxComm.IP = value;
-                this.OnPropertyChanged();
-            }
-        }
+        public ushort Port { get; set; }
 
-        public string Port
-        {
-            get
-            {
-                return this.xenaxComm.Port;
-            }
-
-            set
-            {
-                this.xenaxComm.Port = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public string Command
-        {
-            get
-            {
-                return this.xenaxComm.Command;
-            }
-
-            set
-            {
-                this.xenaxComm.Command = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public string ConnectionStatus
-        {
-            get
-            {
-                return this.connectionStatus;
-            }
-
-            set
-            {
-                this.connectionStatus = value;
-                this.OnPropertyChanged();
-            }
-        }
+        public string Command { get; set; }
 
         public ICollectionView XenaxOutput { get; private set; }
 
-        public IAsyncCommand ConnectCommand { get; private set; }
+        public AsyncCommand<object> ConnectCommand { get; private set; }
 
         public RelayCommand DisconnectCommand { get; private set; }
 
@@ -98,55 +43,85 @@ namespace XenaxControl.ViewModels
 
         private void WireCommands()
         {
-            this.ConnectCommand = new AsyncCommand<bool>(
-                async token =>
+            ConnectCommand = AsyncCommand.Create(
+                async (token, param) =>
                 {
-                    await this.xenaxComm.ConnectAsync(token);
-                    if (this.xenaxComm.Connected)
+                    try
                     {
-                        this.ConnectionStatus = "Connected";
-                        return true;
+                        IPAddress address = IPAddress.Parse(IP);
+                        _driver = new XenaxAxisDriver(address, Port);
+                        await _driver.ConnectAsync(token);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        this.ConnectionStatus = "Failed to connect";
-                        return false;
+                        MessageBox.Show(e.Message);
                     }
                 },
-                param => !this.xenaxComm.Connected);
+                param => _driver?.Connected != true);
 
-            this.DisconnectCommand = new RelayCommand(
+            DisconnectCommand = new RelayCommand(
                 param =>
                 {
-                    this.xenaxComm.Disconnect();
-                    this.ConnectionStatus = "Disconnected";
+                    _driver.Disconnect();
                 },
-                param => this.xenaxComm.Connected);
+                param => _driver?.Connected == true);
 
-            this.SendCommand = new RelayCommand(
+            SendCommand = new RelayCommand(
                 param =>
                 {
-                    this.xenaxComm.Send();
-                    this.Command = string.Empty;
-                    this.XenaxOutput.Refresh();
+                    string output = _driver.SendCommand(Command);
+                    _xenaxOutput.Add(string.Format("> {0}", output));
+                    XenaxOutput.Refresh();
                 },
-                param => this.xenaxComm.Connected);
+                param => _driver?.Connected == true);
 
-            this.ProcessStatusCommand = new RelayCommand(
+            ProcessStatusCommand = new RelayCommand(
                 param =>
                 {
-                    this.xenaxComm.GetProcessStatus();
-                    this.XenaxOutput.Refresh();
-                },
-                param => this.xenaxComm.Connected);
+                    try
+                    {
+                        string echoCommand = _driver.SendCommand("TPSR");
+                        string processedCommand = _driver.ProcessEchoCommand(echoCommand, "TPSR");
 
-            this.ClearCommand = new RelayCommand(
+                        if (!int.TryParse(
+                            processedCommand,
+                            System.Globalization.NumberStyles.HexNumber,
+                            null,
+                            out int axisStatus))
+                        {
+                            throw new InvalidOperationException(
+                                $"An error occurred when attempting to GetAxisStatus on {IP}" +
+                                $" failed to parse Axis Status.");
+                        }
+
+                        string output = string.Empty;
+                        IntBits status = new IntBits(axisStatus);
+                        foreach (XenaxAxisDriver.AxisStatus processStatus in Enum.GetValues(typeof(XenaxAxisDriver.AxisStatus)))
+                        {
+                            if (status[(int)processStatus])
+                            {
+                                output += string.Format("\r\n\t{0}", processStatus);
+                            }
+                        }
+
+                        _xenaxOutput.Add(string.Format("> {0}", output));
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.Message);
+                    }
+
+                    XenaxOutput.Refresh();
+                },
+                param => _driver?.Connected == true);
+
+            ClearCommand = new RelayCommand(
                 param =>
                 {
-                    this.xenaxComm.ClearXenaxOutput();
-                    this.XenaxOutput.Refresh();
+                    _xenaxOutput.Clear();
+                    XenaxOutput.Refresh();
                 },
-                param => !this.XenaxOutput.IsEmpty);
+                param => _driver?.Connected == true);
         }
     }
 }

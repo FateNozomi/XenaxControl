@@ -55,25 +55,33 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BaseHWDriver.cs" />
-    <Compile Include="DeviceNotConnectedException.cs" />
-    <Compile Include="HWDeviceManager.cs" />
-    <Compile Include="IDriver.cs" />
-    <Compile Include="IntBits.cs" />
-    <Compile Include="Models\XenaxCommunication.cs" />
     <Compile Include="Framework\AsyncCommand.cs" />
+    <Compile Include="Framework\AsyncCommand{TResult}.cs" />
     <Compile Include="Framework\IAsyncCommand.cs" />
-    <Compile Include="Converters\EnumerableToStringConverter.cs" />
+    <Compile Include="Framework\IMessageBoxService.cs" />
+    <Compile Include="Framework\IWindowService.cs" />
+    <Compile Include="Framework\MessageBoxService.cs" />
     <Compile Include="Framework\NotifyTaskCompletion.cs" />
-    <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Framework\PropertyChangedBase.cs" />
     <Compile Include="Framework\RelayCommand.cs" />
+    <Compile Include="Framework\RelayCommand{TResult}.cs" />
+    <Compile Include="Framework\WindowService.cs" />
+    <Compile Include="Hardware\Controllers\AxisController.cs" />
+    <Compile Include="Hardware\Controllers\Controller.cs" />
+    <Compile Include="Hardware\Controllers\IAxisController.cs" />
+    <Compile Include="Hardware\Controllers\XenaxAxisController.cs" />
+    <Compile Include="Hardware\Drivers\Direction.cs" />
+    <Compile Include="Hardware\Drivers\Driver.cs" />
+    <Compile Include="Hardware\Drivers\IAxisDriver.cs" />
+    <Compile Include="Hardware\Drivers\StopMode.cs" />
+    <Compile Include="Hardware\Drivers\XenaxAxisDriver.cs" />
+    <Compile Include="Utilities\IntBits.cs" />
+    <Compile Include="Converters\EnumerableToStringConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="ViewModels\XenaxCommViewModel.cs" />
     <Compile Include="Views\CommunicationControl.xaml.cs">
       <DependentUpon>CommunicationControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="XenaxHWController.cs" />
-    <Compile Include="XenaxHWDriver.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -120,6 +128,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Models\" />
     <Folder Include="Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

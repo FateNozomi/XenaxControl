@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace XenaxControl
+namespace Framework.MVVM
 {
     public interface IAsyncCommand : ICommand
     {

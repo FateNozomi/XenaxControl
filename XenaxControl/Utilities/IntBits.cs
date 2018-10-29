@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XenaxControl
+namespace XenaxControl.Utilities
 {
     public struct IntBits
     {
-        private int bits;
-
         public IntBits(int initialBitValue)
         {
-            this.bits = initialBitValue;
+            Bits = initialBitValue;
         }
+
+        public int Bits { get; private set; }
 
         public bool this[int index]
         {
@@ -21,7 +21,7 @@ namespace XenaxControl
             {
                 if (index >= 0)
                 {
-                    return (this.bits & (1 << index)) != 0;
+                    return (Bits & (1 << index)) != 0;
                 }
                 else
                 {
@@ -34,11 +34,11 @@ namespace XenaxControl
                 // turn the bit on if value is true; otherwise, turn it off
                 if (value)
                 {
-                    this.bits |= 1 << index;
+                    Bits |= 1 << index;
                 }
                 else
                 {
-                    this.bits &= ~(1 << index);
+                    Bits &= ~(1 << index);
                 }
             }
         }
